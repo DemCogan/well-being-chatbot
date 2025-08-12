@@ -59,15 +59,18 @@ for msg in st.session_state.messages:
 bot_messages_count = len([m for m in st.session_state.messages if m["role"] == "assistant"])
 
 if bot_messages_count >= 6:
-    # --- ANGEPASSTE LOGIK FÜR IFRAME-EINBETTUNG ---
-    # State AFTER 5 rounds: Display a final instruction message and disable input.
-    # The user should now scroll down on the SoSci Survey page and click "Next".
+    # State AFTER 5 rounds: Display survey link and disable input.
     
-    st.success("Vielen Dank für das Gespräch! 🙏\n\n"
-               "Bitte scrolle nun auf der Seite nach unten und klicke auf den **'Weiter'-Knopf**, um mit der Umfrage fortzufahren.")
+    sosci_survey_base_url = "https://www.soscisurvey.de/test489380/"
+    case_number = st.session_state.get("case_number", "test_case")
     
-    # The input field is disabled as the conversation is over. No link is needed.
-    st.chat_input("Das Gespräch ist beendet.", disabled=True)
+    # Creates the personalized return link so SoSci Survey recognizes the participant.
+    return_link = f"{sosci_survey_base_url}?q=return&case={case_number}"
+
+    st.success("Thank you for the conversation! 🙏\n\n"
+               "Please take 2 minutes for an anonymous survey about your experience. I would really appreciate it!")
+    st.markdown(f"**[Click here to continue to the survey]({return_link})**", unsafe_allow_html=True)
+    st.chat_input("The conversation has ended.", disabled=True)
 else:
     # State DURING the conversation (fewer than 6 bot messages).
     if prompt := st.chat_input("What's on your mind?"):
@@ -145,3 +148,5 @@ else:
             st.rerun()
         except Exception as e:
             st.error(f"Sorry, an error occurred: {e}")
+
+# streamlit run app_EN2.py
