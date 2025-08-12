@@ -11,19 +11,19 @@ except (KeyError, FileNotFoundError):
 
 # --- Read URL parameters from SoSci Survey ---
 try:
-    # Stores the unique participant ID from SoSci Survey (e.g., "12345").
     st.session_state.case_number = st.query_params.get("case")
-    # Reads the assigned group (1 for "present", 2 for "absent").
-    gruppe = st.query_params.get("gruppe")
-    if gruppe == "1":
+    st.session_state.gruppe = st.query_params.get("gruppe")
+
+    # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
+    st.info(f"DEBUG: Empfangene Case Number = {st.session_state.case_number} | Empfangene Gruppe = {st.session_state.gruppe}")
+
+    if st.session_state.gruppe == "1":
         st.session_state.condition_from_url = "present"
-    elif gruppe == "2":
+    elif st.session_state.gruppe == "2":
         st.session_state.condition_from_url = "absent"
     else:
-        # Fallback if the "gruppe" parameter is missing or invalid.
         st.session_state.condition_from_url = random.choice(["present", "absent"])
 except Exception:
-    # Safe fallback for local testing when no URL parameters are present.
     st.session_state.case_number = "test_case"
     st.session_state.condition_from_url = "present"
 
@@ -36,9 +36,7 @@ st.caption("A listening ear for your daily student life")
 # --- Session State Management ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
 if "condition" not in st.session_state:
-    # The experimental condition is now read from the URL, no longer chosen randomly here.
     st.session_state.condition = st.session_state.get("condition_from_url")
 
 # --- Welcome Message ---
@@ -55,17 +53,24 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 # --- Conversation End vs. Ongoing Conversation Logic ---
-# Counts the number of bot messages (Welcome + 5 replies = 6)
 bot_messages_count = len([m for m in st.session_state.messages if m["role"] == "assistant"])
 
 if bot_messages_count >= 6:
     # State AFTER 5 rounds: Display survey link and disable input.
     
-    sosci_survey_base_url = "https://www.soscisurvey.de/test489380/"
+    # =============================== WICHTIG! ===============================
+    # HIER MUSST DU DEINE KORREKTE PROJEKT-ID VON SOSCI SURVEY EINTRAGEN!
+    # Schaue in die URL deines Browsers, wenn du dein Projekt bearbeitest.
+    # z.B. https://www.soscisurvey.de/DEIN_PROJEKTNAME/
+    # ========================================================================
+    sosci_survey_base_url = "https://www.soscisurvey.de/test489380/" # <--- BITTE ÜBERPRÜFEN UND ANPASSEN!
+
     case_number = st.session_state.get("case_number", "test_case")
     
-    # Erstellt den personalisierten Rückkehr-Link, der auf Seite 5 verweist.
     return_link = f"{sosci_survey_base_url}?p=5&r={case_number}"
+
+    # DEBUG-AUSGABE 2: Zeigt den Link an, der für den Rücksprung zur Umfrage erstellt wird.
+    st.info(f"DEBUG: Generierter Rückkehr-Link: {return_link}")
 
     st.success("Thank you for the conversation! 🙏\n\n"
                "Please take 2 minutes for an anonymous survey about your experience. I would really appreciate it!")
@@ -78,10 +83,7 @@ else:
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Recalculate bot message count after user input.
         current_bot_messages = len([m for m in st.session_state.messages if m["role"] == "assistant"])
-        
-        # Determine if the response to be generated will be the last one.
         is_final_bot_message = (current_bot_messages == 5)
         
         # --- Select the correct System Prompt ---
@@ -144,7 +146,6 @@ else:
                 reply = response.choices[0].message.content.strip()
                 st.session_state.messages.append({"role": "assistant", "content": reply})
             
-            # Reload the page to display the bot's response.
             st.rerun()
         except Exception as e:
             st.error(f"Sorry, an error occurred: {e}")
