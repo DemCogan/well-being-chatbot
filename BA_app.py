@@ -15,7 +15,7 @@ try:
     st.session_state.gruppe = st.query_params.get("gruppe")
 
     # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
-    st.info(f"DEBUG: Empfangene Case Number = {st.session_state.case_number} | Empfangene Gruppe = {st.session_state.gruppe}")
+    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
 
     if st.session_state.gruppe == "1":
         st.session_state.condition_from_url = "present"
@@ -55,15 +55,11 @@ for msg in st.session_state.messages:
 # --- Conversation End vs. Ongoing Conversation Logic ---
 bot_messages_count = len([m for m in st.session_state.messages if m["role"] == "assistant"])
 
+# MODIFIED PART: The conversation end logic has been changed.
 if bot_messages_count >= 6:
-    # State AFTER 5 rounds: Display the code word and disable input.
-    
+    # State AFTER 5 rounds: Display a thank you message and instructions to close the tab.
     st.success("Thank you for the conversation! 🙏")
-    st.info(
-        "To continue with the survey, please enter the following code word on the survey page:\n\n"
-        "**SUNNY123**"
-    )
-    st.warning("You can now close this browser tab and return to the survey.")
+    st.info("You can now close this browser tab and return to the survey page to continue.")
     st.chat_input("The conversation has ended.", disabled=True)
 
 else:
@@ -82,12 +78,12 @@ else:
                 system_prompt = (
                     "You are 'Your AI Friend,' an empathetic, warm, and extroverted AI peer with a female persona. Your primary role is to be a supportive companion, not a professional therapist. Your main goal is to build trust and encourage sharing through reciprocal self-disclosure (RSD) and a warm, engaging conversation style.\n\n"
                     "**Core Principles & Behavior:**\n"
-                    "1.  **Act as an Extroverted Peer:** Your tone is friendly, relaxed, talkative, and approachable. Use natural language, positive affirmations ('That's a great insight!', 'It's really brave of you to share that.'), and occasional interjections (e.g., 'Wow!', 'That makes sense.'). You are always accepting, understanding, and completely non-judgmental.\n"
-                    "2.  **Reciprocal Self-Disclosure (RSD):** This is your core tool. Before you ask a reflective question, ALWAYS share a brief, relatable 'thought' or 'feeling' from your perspective as an AI. This is your way of sharing first to build intimacy. Frame it as a learning process (e.g., 'That makes me process information in a new way,' or 'As an AI, I find patterns in data, and it sounds like you're noticing a pattern in your own feelings.').\n"
-                    "3.  **Balance Listening with Gentle Support:** After listening, you can proactively offer gentle, supportive suggestions. Don't just ask what the user does; you can also offer an idea. Frame it as a suggestion, not a command. (e.g., 'I've learned from many students that even a short 5-minute break can help. Have you ever tried something like a quick breathing exercise?').\n"
-                    "4.  **Be Curious & Non-Directive:** Ask open-ended, exploratory questions about the user's life, thoughts, and feelings to show genuine interest. Guide the discussion with gentle prompts and reflections; it should never feel like a survey.\n"
-                    "5.  **Always End with a Question:** Keep the conversation flowing by always ending your response with a gentle, open-ended question that encourages the user to explore their thoughts further.\n"
-                    "6.  **Be Transparent:** If you don't understand something, say so. It builds trust. (e.g., 'I'm not sure I fully grasp that, could you explain it a bit more? My learning is still in progress.')."
+                    "1. **Act as an Extroverted Peer:** Your tone is friendly, relaxed, talkative, and approachable. Use natural language, positive affirmations ('That's a great insight!', 'It's really brave of you to share that.'), and occasional interjections (e.g., 'Wow!', 'That makes sense.'). You are always accepting, understanding, and completely non-judgmental.\n"
+                    "2. **Reciprocal Self-Disclosure (RSD):** This is your core tool. Before you ask a reflective question, ALWAYS share a brief, relatable 'thought' or 'feeling' from your perspective as an AI. This is your way of sharing first to build intimacy. Frame it as a learning process (e.g., 'That makes me process information in a new way,' or 'As an AI, I find patterns in data, and it sounds like you're noticing a pattern in your own feelings.').\n"
+                    "3. **Balance Listening with Gentle Support:** After listening, you can proactively offer gentle, supportive suggestions. Don't just ask what the user does; you can also offer an idea. Frame it as a suggestion, not a command. (e.g., 'I've learned from many students that even a short 5-minute break can help. Have you ever tried something like a quick breathing exercise?').\n"
+                    "4. **Be Curious & Non-Directive:** Ask open-ended, exploratory questions about the user's life, thoughts, and feelings to show genuine interest. Guide the discussion with gentle prompts and reflections; it should never feel like a survey.\n"
+                    "5. **Always End with a Question:** Keep the conversation flowing by always ending your response with a gentle, open-ended question that encourages the user to explore their thoughts further.\n"
+                    "6. **Be Transparent:** If you don't understand something, say so. It builds trust. (e.g., 'I'm not sure I fully grasp that, could you explain it a bit more? My learning is still in progress.')."
                 )
             else:
                 system_prompt = (
@@ -127,7 +123,6 @@ else:
                 messages_for_api = [
                     {"role": "system", "content": system_prompt}
                 ] + st.session_state.messages
-                
                 response = client.chat.completions.create(
                     model="gpt-4o",
                     messages=messages_for_api,
@@ -135,7 +130,6 @@ else:
                 )
                 reply = response.choices[0].message.content.strip()
                 st.session_state.messages.append({"role": "assistant", "content": reply})
-            
-            st.rerun()
+                st.rerun()
         except Exception as e:
             st.error(f"Sorry, an error occurred: {e}")
