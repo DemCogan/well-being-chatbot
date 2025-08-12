@@ -67,7 +67,7 @@ if bot_messages_count >= 6:
 
     case_number = st.session_state.get("case_number", "test_case")
     
-    return_link = f"{sosci_survey_base_url}?q=return&case={case_number}"
+    return_link = f"{sosci_survey_base_url}?p=5&r={case_number}"
 
     # DEBUG-AUSGABE 2: Zeigt den Link an, der für den Rücksprung zur Umfrage erstellt wird.
     st.info(f"DEBUG: Generierter Rückkehr-Link: {return_link}")
