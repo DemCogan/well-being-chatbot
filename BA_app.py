@@ -64,8 +64,8 @@ if bot_messages_count >= 6:
     sosci_survey_base_url = "https://www.soscisurvey.de/test489380/"
     case_number = st.session_state.get("case_number", "test_case")
     
-    # Creates the personalized return link so SoSci Survey recognizes the participant.
-    return_link = f"{sosci_survey_base_url}?q=return&case={case_number}"
+    # Erstellt den personalisierten Rückkehr-Link, der auf Seite 5 verweist.
+    return_link = f"{sosci_survey_base_url}?p=5&r={case_number}"
 
     st.success("Thank you for the conversation! 🙏\n\n"
                "Please take 2 minutes for an anonymous survey about your experience. I would really appreciate it!")
@@ -148,5 +148,3 @@ else:
             st.rerun()
         except Exception as e:
             st.error(f"Sorry, an error occurred: {e}")
-
-# streamlit run app_EN2.py
