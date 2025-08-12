@@ -56,26 +56,16 @@ for msg in st.session_state.messages:
 bot_messages_count = len([m for m in st.session_state.messages if m["role"] == "assistant"])
 
 if bot_messages_count >= 6:
-    # State AFTER 5 rounds: Display survey link and disable input.
+    # State AFTER 5 rounds: Display the code word and disable input.
     
-    # =============================== WICHTIG! ===============================
-    # HIER MUSST DU DEINE KORREKTE PROJEKT-ID VON SOSCI SURVEY EINTRAGEN!
-    # Schaue in die URL deines Browsers, wenn du dein Projekt bearbeitest.
-    # z.B. https://www.soscisurvey.de/DEIN_PROJEKTNAME/
-    # ========================================================================
-    sosci_survey_base_url = "https://www.soscisurvey.de/test489380/" # <--- BITTE ÜBERPRÜFEN UND ANPASSEN!
-
-    case_number = st.session_state.get("case_number", "test_case")
-    
-    return_link = f"{sosci_survey_base_url}?p=5&r={case_number}"
-
-    # DEBUG-AUSGABE 2: Zeigt den Link an, der für den Rücksprung zur Umfrage erstellt wird.
-    st.info(f"DEBUG: Generierter Rückkehr-Link: {return_link}")
-
-    st.success("Thank you for the conversation! 🙏\n\n"
-               "Please take 2 minutes for an anonymous survey about your experience. I would really appreciate it!")
-    st.markdown(f"**[Click here to continue to the survey]({return_link})**", unsafe_allow_html=True)
+    st.success("Thank you for the conversation! 🙏")
+    st.info(
+        "To continue with the survey, please enter the following code word on the survey page:\n\n"
+        "**SUNNY123**"
+    )
+    st.warning("You can now close this browser tab and return to the survey.")
     st.chat_input("The conversation has ended.", disabled=True)
+
 else:
     # State DURING the conversation (fewer than 6 bot messages).
     if prompt := st.chat_input("What's on your mind?"):
@@ -106,7 +96,7 @@ else:
                     "1. **Validation:** Respond with warmth and understanding to the user's final statement.\n"
                     "2. **Concluding Self-Disclosure:** Share one last brief, positive 'thought' you've learned from the conversation, showing appreciation for what the user has shared.\n"
                     "3. **Warm & Motivating Farewell:** Summarize the conversation positively, show genuine appreciation for the exchange, and end with a warm, encouraging farewell that leaves the user feeling better. Crucially, remind the user of your availability.\n"
-                    "**Crucial Rule:** Do NOT ask a question. End with something like: 'It was really great talking to you. Remember, I'm here 24/7 whenever you need to talk. Take care!'"
+                    "**Crucial Rule:** Do NOT ask a question. End with something like: 'It's really great talking to you. Remember, I'm here 24/7 whenever you need to talk. Take care!'"
                 )
         else: # condition == "absent"
             if not is_final_bot_message:
@@ -126,7 +116,7 @@ else:
                     "**Response Structure:**\n"
                     "1. **Neutral Acknowledgment:** Respond with understanding to the user's statement.\n"
                     "2. **Brief Summary:** Briefly and neutrally summarize the topic of conversation.\n"
-                    "3. **Neutral Farewell:** Say goodbye professionally.\n\n"
+                    "3. **Neutral Farewell:** Say goodbye professionally.\n"
                     "**Important Rules:**\n"
                     "- Do NOT ask a question.\n"
                     "- Remain completely neutral."
