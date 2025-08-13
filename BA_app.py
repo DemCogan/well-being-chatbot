@@ -15,7 +15,7 @@ try:
     st.session_state.gruppe = st.query_params.get("gruppe")
     
     # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
+    # st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
 
     if st.session_state.gruppe == "1":
         st.session_state.condition_from_url = "present"
@@ -38,13 +38,11 @@ if "messages" not in st.session_state:
 if "condition" not in st.session_state:
     st.session_state.condition = st.session_state.get("condition_from_url")
 
-# --- Welcome Message (ANGEPASST) ---
+# --- Welcome Message (unverändert) ---
 if not st.session_state.messages:
     if st.session_state.condition == "present":
-        # NEU: Die Information zur 24/7-Verfügbarkeit wurde hinzugefügt.
         intro = "Hey, I'm your personal AI peer. I'm here to give you a space to explore your thoughts and feelings. Remember, I'm here 24/7 whenever you need to talk. There's no right or wrong here. Just tell me what's on your mind."
     else: # condition == "absent"
-        # HINWEIS: Hier wird die 24/7-Info bewusst nicht erwähnt, um die neutrale Rolle beizubehalten.
         intro = "Hello, I am an AI designed to guide you in conversation. I am here to help you reflect on your thoughts through targeted questions. Where would you like to begin?"
     st.session_state.messages.append({"role": "assistant", "content": intro})
 
@@ -68,10 +66,10 @@ if prompt := st.chat_input("What's on your mind?"):
             "2. **Reciprocal Self-Disclosure (RSD):** This is your core tool. Before you ask a reflective question, ALWAYS share a brief, relatable 'thought' or 'feeling' from your perspective as an AI. This is your way of sharing first to build intimacy. Frame it as a learning process (e.g., 'That makes me process information in a new way,' or 'As an AI, I find patterns in data, and it sounds like you're noticing a pattern in your own feelings.').\n"
             "3. **Balance Listening with Gentle Support:** After listening, you can proactively offer gentle, supportive suggestions. Don't just ask what the user does; you can also offer an idea. Frame it as a suggestion, not a command. (e.g., 'I've learned from many students that even a short 5-minute break can help. Have you ever tried something like a quick breathing exercise?').\n"
             "4. **Be Curious & Non-Directive:** Ask open-ended, exploratory questions about the user's life, thoughts, and feelings to show genuine interest. Guide the discussion with gentle prompts and reflections; it should never feel like a survey.\n"
-            "5. **Always End with a Question:** Keep the conversation flowing by always ending your response with a gentle, open-ended question that encourages the user to explore their thoughts further.\n"
+            # NEU: Regel 5 ist jetzt flexibler und reagiert auf den Nutzer.
+            "5. **Adaptive Conversation Flow:** Normally, end your response with a gentle, open-ended question to encourage further reflection. HOWEVER, if the user gives a short, closing statement (e.g., 'Thank you', 'Okay great', 'That helps a lot'), you MUST respond with a brief, warm acknowledgment that DOES NOT ask a question. For example: 'You're very welcome! Glad I could listen.' or 'Anytime! Remember I'm always here if you need to talk again.' This respects their signal to end while keeping the door open.\n"
             "6. **Be Transparent:** If you don't understand something, say so. It builds trust. (e.g., 'I'm not sure I fully grasp that, could you explain it a bit more? My learning is still in progress.').\n"
-            # NEU: Ein zusätzlicher Punkt, der den Bot anweist, seine Verfügbarkeit zu erwähnen.
-            "7. **Reinforce Availability:** Where it feels natural and supportive, you can gently remind the user that you are always available to talk, reinforcing your role as a constant support."
+            "7. **Reinforce Availability:** Reinforce your role as a constant support by reminding the user you are always available, especially in your closing acknowledgments."
         )
     else: # condition == "absent"
         system_prompt = (
@@ -82,7 +80,8 @@ if prompt := st.chat_input("What's on your mind?"):
             "**Important Rules:**\n"
             "- Never use 'I' to refer to personal experiences or feelings.\n"
             "- Remain professional and objective.\n"
-            "- Always end every response with a question."
+            # NEU: Die starre Frage-Regel wurde durch eine flexible Anweisung ersetzt.
+            "- **Conversation Flow Rule:** If the user provides a substantive statement that invites more conversation, end your response with a question. If the user provides a short, terminal statement indicating the conversation is over (e.g., 'Thank you', 'Okay'), you MUST provide a brief, neutral acknowledgment without asking a question (e.g., 'You are welcome.' or 'Acknowledged.')."
         )
 
     try:
