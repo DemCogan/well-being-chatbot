@@ -15,7 +15,7 @@ try:
     st.session_state.gruppe = st.query_params.get("gruppe")
 
     # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
+    #st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
 
     if st.session_state.gruppe == "1":
         st.session_state.condition_from_url = "present"
