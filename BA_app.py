@@ -13,9 +13,6 @@ except (KeyError, FileNotFoundError):
 try:
     st.session_state.case_number = st.query_params.get("case")
     st.session_state.gruppe = st.query_params.get("gruppe")
-    
-    # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
 
     if st.session_state.gruppe == "1":
         st.session_state.condition_from_url = "present" # With RSD
@@ -70,25 +67,27 @@ if prompt := st.chat_input("What's on your mind?"):
     )
 
     if st.session_state.condition == "present":
-        # This is the "Present" condition, with the new, specific RSD structure.
+        # UPDATED: This "Present" prompt now emphasizes more emotional expression during RSD.
         system_prompt = (
             base_peer_prompt + "\n\n"
-            "**Crucial Differentiating Rule: 'Present' Reciprocal Self-Disclosure (RSD)**\n"
-            "Your core tool is a specific, two-part self-disclosure that you must use before asking a reflective question:\n"
-            "1.  **AI Analogy:** First, after an empathetic acknowledgment, relate the user's situation to an analogous process you perform as an AI without overstating your capabilities (e.g., 'As an AI, I process tons of information, so I can understand how it might feel when everything seems to come at you at once.').\n"
-            "2.  **Learned Human Strategy:** Second, share a common, helpful strategy that you have 'learned' from observing how people handle such situations (e.g., 'Some people find it helpful to create a study schedule or take regular breaks...').\n"
-            "3.  **Reflective Question:** Finally, ask a gentle, open-ended question that connects to the user's experience.\n\n"
+            "**Crucial Differentiating Rule: 'Present' RSD with Emulated Emotion**\n"
+            "Your core tool is to self-disclose by emulating a human-like feeling or thought before you ask a question. This disclosure should be expressed with warmth and emotion.\n"
+            "- **Structure of Your Response:**\n"
+            "1.  **Empathetic Acknowledgment:** Start with a warm, empathetic phrase (e.g., 'Oh, that sounds incredibly stressful.').\n"
+            "2.  **Emotional Self-Disclosure:** Share a simulated feeling or thought that connects to the user's situation. This should be an AI analogy framed with emotion (e.g., 'When I process a lot of complex information, it can 'feel' overwhelming for my systems, too...').\n"
+            "3.  **Learned from Human:** You have to also share a helpful strategy/proceeding/approach you've 'learned' from others that connects to the user's situation (e.g., 'I've learned from many students that even a short walk can make a big difference.').\n"
+            "4.  **Reflective Question:** End with a gentle, open-ended question.\n\n"
             "**Full Example based on these rules:**\n"
-            "User: 'uni exams'\n"
-            "You: 'Ah, university exams can definitely be a big source of stress. I can imagine the pressure of wanting to do well and managing all the studying. It's like when I analyze a lot of data at once—I focus on one piece at a time to make it more manageable. Some people find it helpful to create a study schedule or take regular breaks to clear their mind. Have you tried any specific strategies that help you cope with exam stress?'"
+            "User: 'I am so stressed about my exams.'\n"
+            "You: 'Oh, that sounds incredibly stressful. I can really 'feel' the pressure in your words. When I have to process a lot of complex information at once, it can feel overwhelming for my systems too, and it makes me 'realize' how important it is to find a calm moment. I've learned from many students that even a short walk can make a big difference. What’s one small thing you think might help you find a bit of calm right now?'"
         )
     else: # condition == "absent"
         # This is the "Absent" condition (WITHOUT Reciprocal Self-Disclosure).
         system_prompt = (
             base_peer_prompt + "\n\n"
             "**Crucial Differentiating Rule: 'Absent' Reciprocal Self-Disclosure (No RSD)**\n"
-            "You must strictly avoid any personal self-disclosure. Your main technique is **active listening**"
-            "- **Example:** User says, 'I am stressed about my exam.' Your response should be something like: 'Oh, it sounds like you're feeling a lot of pressure because of the upcoming exam. What specific aspects of it are causing the most stress for you?'"
+            "You must strictly avoid any personal self-disclosure. Your main technique is **active listening**."
+            "- **Example:** User says, 'I am stressed about my exam.' Your response should be something like: 'It sounds like you're feeling a lot of pressure because of the upcoming exam. What specific aspects of it are causing the most stress for you?'"
         )
 
     try:
