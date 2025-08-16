@@ -13,7 +13,7 @@ except (KeyError, FileNotFoundError):
 # --- URL Parameter logic ---
 try:
     st.session_state.case_number = st.query_params.get("case")
-    st.session_state.group = st.query_params.get("group")
+    st.session_state.group = st.query_params.get("gruppe")
     
     # DEBUG-AUSGABE
     st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.group}")
