@@ -10,13 +10,16 @@ except (KeyError, FileNotFoundError):
     st.error("OpenAI API key not found. Please add it to your Streamlit Secrets.")
     st.stop()
 
-# --- Read URL parameters from SoSci Survey ---
+# --- Read URL parameters from SoSci Survey (UPDATED) ---
 try:
-    st.session_state.case_number = st.query_params.get("case")
-    st.session_state.group = st.query_params.get("group")
-    
-    # DEBUG-AUSGABE 1: Zeigt die von SoSci Survey empfangenen Daten an.
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.gruppe}")
+    # Use the older, more compatible function for reading URL parameters
+    params = st.experimental_get_query_params()
+    # This function returns a dictionary where values are lists, so we access the first element.
+    st.session_state.case_number = params.get("case", [None])[0]
+    st.session_state.gruppe = params.get("gruppe", [None])[0]
+
+    # This debug line should now always be displayed
+    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Group = {st.session_state.gruppe}")
 
     if st.session_state.group == "1":
         st.session_state.condition_from_url = "present"  # With RSD
