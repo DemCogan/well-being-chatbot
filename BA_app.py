@@ -10,16 +10,13 @@ except (KeyError, FileNotFoundError):
     st.error("OpenAI API key not found. Please add it to your Streamlit Secrets.")
     st.stop()
 
-# --- Read URL parameters from SoSci Survey (UPDATED) ---
+# --- URL Parameter logic ---
 try:
-    # Use the older, more compatible function for reading URL parameters
-    params = st.experimental_get_query_params()
-    # This function returns a dictionary where values are lists, so we access the first element.
-    st.session_state.case_number = params.get("case", [None])[0]
-    st.session_state.gruppe = params.get("gruppe", [None])[0]
-
-    # This debug line should now always be displayed
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Group = {st.session_state.gruppe}")
+    st.session_state.case_number = st.query_params.get("case")
+    st.session_state.group = st.query_params.get("group")
+    
+    # DEBUG-AUSGABE
+    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.group}")
 
     if st.session_state.group == "1":
         st.session_state.condition_from_url = "present"  # With RSD
@@ -42,7 +39,7 @@ if "messages" not in st.session_state:
 if "condition" not in st.session_state:
     st.session_state.condition = st.session_state.get("condition_from_url", "absent")
 
-# --- Welcome Message # present ---
+# --- Welcome Messages present---
 if not st.session_state.messages:
     if st.session_state.condition == "present":
         intro = (
@@ -64,7 +61,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# --- Helpers ---
+# --- Helper Functions ---
 def user_signals_end(text: str) -> bool:
     if not text:
         return False
@@ -83,7 +80,8 @@ if prompt := st.chat_input("What’s on your mind?"):
 
     end_now = user_signals_end(prompt)
 
-    # Base prompt establishes the core persona and rules.
+    # --- FINAL PROMPT DESIGN ---
+    # This is the base personality that applies to both groups.
     base_peer_prompt = (
         "You are 'Your AI Friend,' an extroverted and empathetic AI peer. "
         "You are transparent about being an AI, but your goal is to connect on a human level. "
