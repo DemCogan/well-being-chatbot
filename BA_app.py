@@ -16,7 +16,7 @@ try:
     st.session_state.group = st.query_params.get("gruppe")
     
     # DEBUG-AUSGABE
-    st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.group}")
+    #st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.group}")
 
     if st.session_state.group == "1":
         st.session_state.condition_from_url = "present"  # With RSD
