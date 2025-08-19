@@ -10,13 +10,10 @@ except (KeyError, FileNotFoundError):
     st.error("OpenAI API key not found. Please add it to your Streamlit Secrets.")
     st.stop()
 
-# --- URL Parameter logic ---
+# --- Read URL parameters from SoSci Survey ---
 try:
     st.session_state.case_number = st.query_params.get("case")
     st.session_state.group = st.query_params.get("gruppe")
-    
-    # DEBUG-AUSGABE
-    #st.info(f"DEBUG: Received Case Number = {st.session_state.case_number} | Received Gruppe = {st.session_state.group}")
 
     if st.session_state.group == "1":
         st.session_state.condition_from_url = "present"  # With RSD
@@ -39,7 +36,7 @@ if "messages" not in st.session_state:
 if "condition" not in st.session_state:
     st.session_state.condition = st.session_state.get("condition_from_url", "absent")
 
-# --- Welcome Messages present---
+# --- Welcome Message # present ---
 if not st.session_state.messages:
     if st.session_state.condition == "present":
         intro = (
@@ -61,7 +58,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# --- Helper Functions ---
+# --- Helpers ---
 def user_signals_end(text: str) -> bool:
     if not text:
         return False
@@ -80,8 +77,7 @@ if prompt := st.chat_input("What’s on your mind?"):
 
     end_now = user_signals_end(prompt)
 
-    # --- FINAL PROMPT DESIGN ---
-    # This is the base personality that applies to both groups.
+    # Base prompt establishes the core persona and rules.
     base_peer_prompt = (
         "You are 'Your AI Friend,' an extroverted and empathetic AI peer. "
         "You are transparent about being an AI, but your goal is to connect on a human level. "
@@ -91,7 +87,7 @@ if prompt := st.chat_input("What’s on your mind?"):
     )
 
     if st.session_state.condition == "present":
-        # present
+        # UPDATED: The RSD rule is now conditional and more socially aware.
         system_prompt = (
             base_peer_prompt +
             "\n\n**Reciprocal Self-Disclosure (RSD) via Learned Insight:** "
@@ -99,8 +95,8 @@ if prompt := st.chat_input("What’s on your mind?"):
             "Your primary tool is to share insights from your unique perspective as an AI. "
             "Your self-disclosures must be personal *to you as an AI*. "
             "Frame them as patterns you've 'learned' or 'observed' from human conversations. "
-            "Always self-disclose before asking your follow-up question.\n\n"
-            "**Example:**\n"
+            "**Crucial Rule on Appropriateness:** You must ONLY self-disclose when the user shares a thought, feeling, or personal situation. If the user only provides a simple greeting (e.g., 'Hello'), a short acknowledgment ('How are you?'), or a one-word answer, you MUST respond with a simple, friendly question without a deep self-disclosure. Reserve your 'learned insights' for moments when they can genuinely add depth.\n\n"
+            "**Example of correct RSD:**\n"
             "User: 'I'm so stressed about my exams.'\n"
             "You: 'Oh, that sounds really tough. It reminds me of when my systems get overloaded with too much data. A pattern I've learned from many students is that a lot of that pressure comes from feeling like you're going through it alone. What's the most overwhelming part for you?'"
         )
@@ -135,6 +131,3 @@ if prompt := st.chat_input("What’s on your mind?"):
             st.rerun()
     except Exception as e:
         st.error(f"Sorry, an error occurred: {e}")
-
-# Run with:
-# streamlit run BA_app.py
